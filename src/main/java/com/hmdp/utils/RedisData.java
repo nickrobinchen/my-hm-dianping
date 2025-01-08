@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class RedisData<T> {
+public class RedisData {
     private LocalDateTime expireTime;
-    private T data;
+    private Object data;
 }
