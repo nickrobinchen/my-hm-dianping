@@ -7,7 +7,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
     url: jdbc:mysql://127.0.0.1:3306/hmdp?useSSL=false&serverTimezone=UTC
     username: root
-    password: 1a2b3c4d
+    password: 1a2b3c
   redis:
     host: 127.0.0.1
     port: 6379
@@ -18,6 +18,12 @@ spring:
         max-idle: 10
         min-idle: 1
         time-between-eviction-runs: 10s
+  rabbitmq:
+    host: 127.0.0.1 # 主机名
+    port: 5672 # 端口
+    virtual-host: / # 虚拟主机
+    username: guest # 用户名
+    password: guest # 密码
   jackson:
     default-property-inclusion: non_null # JSON处理时忽略非空字段
 mybatis-plus:
