@@ -33,6 +33,7 @@ public class VoucherOrderConsumer {
         if (count > 0) {
             // 用户已经购买过了
             log.error("用户已经购买过了");
+            return;
         }
         boolean success = seckillVoucherService.update()
                 .setSql("stock = stock - 1")
@@ -42,6 +43,7 @@ public class VoucherOrderConsumer {
 
         if (!success) {
             log.error("库存不足");
+            return;
         }
         long orderId = redisIdWorker.nextId("order");
         voucherOrder.setId(orderId);

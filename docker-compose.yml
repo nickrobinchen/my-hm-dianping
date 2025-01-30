@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 1a2b3c4d
+      MYSQL_DATABASE: hmdp
+    ports:
+      - "3306:3306"
+    volumes:
+      - "./src/main/resources/db/my_hmdp.sql:/usr/my_hmdp.sql"
+      - "./mysql.cnf:/etc/mysql/conf.d/utf8mb4.cnf"
+    networks:
+      - backend
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+    networks:
+      - backend
+
+  rabbitmq:
+    image: rabbitmq:management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 60s
+      retries: 5
+      start_period: 10s
+      timeout: 10s
+    ports:
+      - "15672:15672"  # RabbitMQ Management UI
+      - "5672:5672"    # RabbitMQ AMQP protocol
+    networks:
+      - backend
+
+  springboot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: springboot
+    depends_on:
+      - mysql
+      - redis
+      - rabbitmq
+    ports:
+      - "8081:8081"
+    networks:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: nginx
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./www:/etc/nginx/html  # 前端静态文件路径
+    ports:
+      - "8080:8080"
+    depends_on:
+      - springboot
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
