@@ -50,5 +50,6 @@ public class VoucherOrderConsumer {
         voucherOrder.setUserId(userId);
         voucherOrder.setVoucherId(voucherId);
         voucherOrderService.save(voucherOrder);
+        log.info("成功使用RabbitMQ处理消息并下单");
     }
 }

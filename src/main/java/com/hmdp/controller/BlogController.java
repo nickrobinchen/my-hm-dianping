@@ -38,7 +38,7 @@ public class BlogController {
         // 保存探店博文
         blogService.save(blog);
         // 返回id
-        return blogService.saveBlog(blog);//Result.ok(blog.getId());
+        return Result.ok(blog.getId());
     }
 
     @PutMapping("/like/{id}")

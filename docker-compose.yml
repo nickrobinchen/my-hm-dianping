@@ -10,7 +10,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - "./src/main/resources/db/my_hmdp.sql:/usr/my_hmdp.sql"
+      - "./src/main/resources/db/my_hmdp.sql:/usr/hmdp.sql"
       - "./mysql.cnf:/etc/mysql/conf.d/utf8mb4.cnf"
     networks:
       - backend

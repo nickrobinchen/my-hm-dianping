@@ -4,13 +4,16 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.RandomUtil;
+
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hmdp.dto.LoginFormDTO;
 import com.hmdp.dto.Result;
 import com.hmdp.dto.UserDTO;
+import com.hmdp.dto.UserJWTDTO;
 import com.hmdp.entity.User;
 import com.hmdp.mapper.UserMapper;
 import com.hmdp.service.IUserService;
+import com.hmdp.utils.MyJWTUtil;
 import com.hmdp.utils.RegexUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -39,6 +43,9 @@ import static com.hmdp.utils.SystemConstants.USER_NICK_NAME_PREFIX;
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
+
+//    @Resource
+//    private MyJWTUtil jwtUtil;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
@@ -87,15 +94,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 6. 保存用户信息到redis
         // 6.1 生成token
-        String token = UUID.randomUUID().toString(true);
+//        String token = UUID.randomUUID().toString(true);
         // 6.2 将User对象转Hash存储
         UserDTO userDTO = BeanUtil.copyProperties(user, UserDTO.class);
+//        UserJWTDTO userJWTDTO = BeanUtil.copyProperties(user, UserJWTDTO.class);
+//        userJWTDTO.setExpireTime(java.time.LocalDateTime.now().plusHours(6).format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         // 6.3 保存到redis
-        String tokenKey = LOGIN_USER_KEY + token;
+//        String tokenKey = LOGIN_USER_KEY + token;
+
+
         Map<String, Object> userMap = BeanUtil.beanToMap(userDTO, new HashMap<>(), CopyOptions.create().setIgnoreNullValue(true).setFieldValueEditor((fieldName, fieldValue) -> fieldValue.toString()));
-        stringRedisTemplate.opsForHash().putAll(tokenKey, userMap);
-        // 6.4 expire
-        stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
+        String token = MyJWTUtil.getToken(userMap);
+
+
+        //        stringRedisTemplate.opsForHash().putAll(tokenKey, userMap);
+//        // 6.4 expire
+//        stringRedisTemplate.expire(tokenKey, LOGIN_USER_TTL, TimeUnit.MINUTES);
         // 7. 返回成功信息
         return Result.ok(token);
     }
